@@ -1,0 +1,38 @@
+Required Directories (* not created):
+    *Projects
+    *Hackathons
+    Documents
+    Desktop
+    Fonts
+    Templates
+    Hacking
+    Powerhouse_Vault
+    Obsidian_Plugin_Sandbox
+    Pictures
+    Music
+    Downloads
+    Arduino
+    anaconda3
+    Videos
+    *Backups
+    *Research
+    *College
+    *Tutoring
+    snap
+    Org
+
+check each directory in required directories
+ask if files containing ".pdf", ".doc", ".docx" in Downloads should be moved to Documents or removed
+ask if files containing ".png", ".jpg", ".jpeg" in Downloads should be moved to Documents or removed
+ask if files containing ".zip", ".tar.gz", ".deb", ".tar.bz2" in Downloads should be removed
+change all directories to be capitalized except snap & anaconda3
+change directories with "-" to "_"
+if directory contains "_" check for words after and captialize that then change the whole directory name
+cannot touch hidden directories (start with .)
+[] need to create required directories if not existing, ask first
+move directories starting with "Learn" or "Test" or "Study" to Research
+move directories starting with "CS" to College
+move directories starting with "Hackathon" to Hackathon
+if directory has a ".git" file, move it to Projects or Research
+move directories starting with "Terminal" to Projects
+if filename contains "backup" mv to Backups
