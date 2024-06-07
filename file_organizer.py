@@ -1,32 +1,36 @@
 import os
+from logger import get_debug_logger
 import shutil
-import logging
 from pathlib import Path
 
-my_dirs = ['Projects', 'Hackathons', 'Documents', 'Desktop', 'Fonts', 'Templates',
-             'Hacking', 'Powerhouse_Vault', 'Obsidian_Plugin_Sandbox', 'Pictures',
-             'Music', 'Downloads', 'Arduino', 'anaconda3', 'Videos', 'Backups',
-             'Research', 'College']
 
-home_path = Path.home()
-
-logging.basicConfig(
-    filename='logging.log', level=logging.DEBUG,  
-    format=' %(asctime) - %(levelname) - %(message)'
-)
+debug_log_file = open('./debug.log', 'wt', encoding='utf-8')
+debug_logger = get_debug_logger(debug_log_file)
 
 # get list of non-hidden directories
-def get_non_hidden_dirs(directory=None):
+def get_non_hidden_dirs(directory: Path=None) -> list:
     if directory is None:
-        return [], []
+        return []
     
     approved_items = [item for item in os.listdir(directory) if not item.startswith(".")]
     approved_dirs = [item for item in approved_items if os.path.isdir(Path(directory, item))]
+    debug_logger.debug('Approved Directories: %s', approved_dirs)
     return approved_dirs
 
 
+# get list of non-hidden files
+def get_non_hidden_files(directory: Path=None) -> list:
+    if directory == None:
+        return None
+    
+    approved_items = [item for item in os.listdir(directory) if not item.startswith(".")]
+    approved_files = [file for file in approved_items if os.path.isfile(Path(directory, file))]
+    debug_logger.debug('Approved Files: %s', approved_files)
+    return approved_files
+
+
 # TODO: mkdir from dirs list
-def create_required_dirs(dirs, home):
+def create_required_dirs(dirs: list, home: Path):
     try:
         # mkdir each dir in list
         for directory in dirs:
@@ -34,17 +38,17 @@ def create_required_dirs(dirs, home):
                 continue
             else:
                 os.makedirs(home / directory)
-                logging.debug(f'{directory} has been added!')
+                debug_logger.debug('%s has been added!', directory)
     
     except OSError as ose:
-        logging.error(f'OSError in create_required_dirs: {ose}')
+        debug_logger.error('OSError in create_required_dirs: %s', ose)
 
     except Exception as e:
-        logging.error(f'Error in create_required_dirs: {e}')
+        debug_logger.error('Error in create_required_dirs: %s', e)
 
 
 # TODO: mv dirs to Research based on criteria
-def research_dir_funnel(home):
+def research_dir_funnel(home: Path):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         for directory in approved_home_dirs:
@@ -60,20 +64,20 @@ def research_dir_funnel(home):
                 if is_research:
                     source_path = home / directory / item
                     destination_path = home / 'Research'
-                    logging.info(f'Source path in research_dir_funnel: {source_path}')
-                    logging.info(f'Destination path in research_dir_funnel: {destination_path}')
+                    debug_logger.info('Source path in research_dir_funnel: %s', source_path)
+                    debug_logger.info('Destination path in research_dir_funnel: %s', destination_path)
                     # TODO: test before moving anything
                     # moved_dir_path = shutil.move(source_path, destination_path)
-                    # logging.info(f'Directory was move to {moved_dir_path}')
+                    # debug_logger.info(f'Directory was move to {moved_dir_path}')
     except OSError as ose:
-        logging.error(f'OSError in research_dir_funnel: {ose}')
+        debug_logger.error('OSError in research_dir_funnel: %s', ose)
     
     except Exception as e:
-        logging.error(f'Error in research_dir_funnel: {e}')
+        debug_logger.error('Error in research_dir_funnel: %s', e)
 
 
 # TODO: mv dirs to College based on criteria
-def college_dir_funnel(home):
+def college_dir_funnel(home: Path):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         for directory in approved_home_dirs:
@@ -88,21 +92,21 @@ def college_dir_funnel(home):
                 if is_college:
                     source_path = home / directory / item
                     destination_path = home / 'College'
-                    logging.info(f'Source path in college_dir_funnel: {source_path}')
-                    logging.info(f'Destination path in college_dir_funnel: {destination_path}')
+                    debug_logger.info('Source path in college_dir_funnel: %s', source_path)
+                    debug_logger.info('Destination path in college_dir_funnel: %s', destination_path)
                     # TODO: test before moving anything
                     # moved_dir_path = shutil.move(source_path, destination_path)
-                    # logging.info(f'Directory was move to {moved_dir_path}')
+                    # debug_logger.info(f'Directory was move to {moved_dir_path}')
     except OSError as ose:
-        logging.error(f'OSError in college_dir_funnel: {ose}')
+        debug_logger.error('OSError in college_dir_funnel: %s', ose)
     
     except Exception as e:
-        logging.error(f'Error in college_dir_funnel: {e}')
+        debug_logger.error('Error in college_dir_funnel: %s', e)
 
 
 
 # TODO: mv dirs to Hackathon based on criteria
-def hackathon_dir_funnel(home):
+def hackathon_dir_funnel(home: Path):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         for directory in approved_home_dirs:
@@ -118,20 +122,20 @@ def hackathon_dir_funnel(home):
                 if is_hackathon:
                     source_path = home / directory / item
                     destination_path = home / 'Hackathon'
-                    logging.info(f'Source path in hackathon_dir_funnel: {source_path}')
-                    logging.info(f'Destination path in hackathon_dir_funnel: {destination_path}')
+                    debug_logger.info('Source path in hackathon_dir_funnel: %s', source_path)
+                    debug_logger.info('Destination path in hackathon_dir_funnel: %s', destination_path)
                     # TODO: test before moving anything
                     # moved_dir_path = shutil.move(source_path, destination_path)
-                    # logging.info(f'Directory was move to {moved_dir_path}')
+                    # debug_logger.info(f'Directory was move to {moved_dir_path}')
     except OSError as ose:
-        logging.error(f'OSError in hackthon_dir_funnel: {ose}')
+        debug_logger.error('OSError in hackthon_dir_funnel: %s', ose)
     
     except Exception as e:
-        logging.error(f'Error in hackathon_dir_funnel: {e}')
+        debug_logger.error('Error in hackathon_dir_funnel: %s', e)
 
 
 # TODO: mv dirs to Projects based on criteria
-def projects_dirs_funnel(home):
+def projects_dir_funnel(home: Path):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         for directory in approved_home_dirs:
@@ -148,20 +152,20 @@ def projects_dirs_funnel(home):
                 if has_git_file:
                     source_path = home / directory / item
                     destination_path = home / 'Hackathon'
-                    logging.info(f'Source path in hackathon_dir_funnel: {source_path}')
-                    logging.info(f'Destination path in hackathon_dir_funnel: {destination_path}')
+                    debug_logger.info('Source path in hackathon_dir_funnel: %s', source_path)
+                    debug_logger.info('Destination path in hackathon_dir_funnel: %s', destination_path)
                     # TODO: test before moving anything
                     # moved_dir_path = shutil.move(source_path, destination_path)
-                    # logging.info(f'Directory was move to {moved_dir_path}')
+                    # debug_logger.info(f'Directory was move to {moved_dir_path}')
     except OSError as ose:
-        logging.error(f'OSError in hackthon_dir_funnel: {ose}')
+        debug_logger.error('OSError in hackthon_dir_funnel: %s', ose)
     
     except Exception as e:
-        logging.error(f'Error in hackathon_dir_funnel: {e}')
+        debug_logger.error('Error in hackathon_dir_funnel: %s', e)
 
 
 # TODO: mv files to Backups based on criteria
-def backups_dir_funnel():
+def backups_dir_funnel(home: Path):
     pass
 
 # TODO: clean up Downloads dir based on criteria
@@ -179,3 +183,27 @@ def mv_pic_files_to_pictures():
 
 def del_zip_files():
     pass
+
+
+if __name__ == "__main__":
+    my_dirs = ['Projects', 'Hackathons', 'Documents', 'Desktop', 'Fonts', 'Templates',
+                'Hacking', 'Powerhouse_Vault', 'Obsidian_Plugin_Sandbox', 'Pictures',
+                'Music', 'Downloads', 'Arduino', 'anaconda3', 'Videos', 'Backups',
+                'Research', 'College']
+
+    home_path = Path.home()
+    debug_logger.info(f'Home path created: {home_path}')
+    
+
+    #  create required dirs
+    #create_required_dirs(my_dirs, home_path)
+
+    # directory funnels
+    #research_dir_funnel(test_path)
+    #college_dir_funnel(test_path)
+    #hackathon_dir_funnel(test_path)
+    #projects_dir_funnel(test_path)
+
+    # close debug log file
+    debug_log_file.close()
+

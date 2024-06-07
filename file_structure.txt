@@ -2,7 +2,7 @@ Required Directories (* not created):
     *Projects
     *Hackathons
     Documents -> '.pdf', '.doc', '.docx'
-    Desktop
+    Desktop -> ask before moving files from here (Clear Desktop? Y/N)
     Fonts
     Templates
     Hacking
