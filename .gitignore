@@ -1,2 +1,4 @@
 .directory
 debug.log
+.venv
+__pycache__
