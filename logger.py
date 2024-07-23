@@ -1,21 +1,49 @@
-''' Module for logger functionality'''
+""" Module for logger functionality"""
+
 import logging
-import typing
 import sys
+import typing
+
 
 # setup debug logger for dev -> debug.log
 def get_debug_logger(file: typing.TextIO) -> logging.Logger:
-    ''' TODO: add docstring '''
-    debug_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    """TODO: add docstring"""
+    debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     debug_handler = logging.StreamHandler(file)
     debug_handler.setFormatter(debug_formatter)
 
     debug_logger = logging.getLogger("Debug Logger")
     debug_logger.setLevel(logging.DEBUG)
     debug_logger.addHandler(debug_handler)
-    
+
     return debug_logger
 
-# TODO: setup sys.stdout stream logger for prod
+
+# setup test logger -> test.log
+def get_test_logger(file: typing.TextIO) -> logging.Logger:
+    """TODO: add docstring"""
+    test_formatter = logging.Formatter(
+        "%(asctime)s - TEST - %(levelname)s - %(message)s"
+    )
+    test_handler = logging.StreamHandler(file)
+    test_handler.setFormatter(test_formatter)
+
+    test_logger = logging.getLogger("Test Logger")
+    test_logger.setLevel(logging.DEBUG)
+    test_logger.addHandler(test_handler)
+
+    return test_logger
 
 
+# setup sys.stdout stream logger for prod
+def get_prod_logger() -> logging.Logger:
+    """TODO: add docstring"""
+    prod_formatter = logging.Formatter("%(levelname)s - %(message)s")
+    prod_handler = logging.StreamHandler(sys.stdout)
+    prod_handler.setFormatter(prod_formatter)
+
+    prod_logger = logging.getLogger("Prod Logger")
+    prod_logger.setLevel(logging.INFO)
+    prod_logger.addHandler(prod_handler)
+
+    return prod_logger
