@@ -5,8 +5,8 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from .logger import get_debug_logger
-from .special_exceptions import EmptyDirectory
+from logger import get_debug_logger
+from special_exceptions import EmptyDirectory
 
 with open("./debug.log", "wt", encoding="utf-8") as debug_log_file:
     debug_logger = get_debug_logger(debug_log_file)
@@ -45,7 +45,9 @@ def get_non_hidden_files(directory: Optional[Path] = None) -> list:
 
 
 def create_required_dirs(dirs: list, home: Path):
-    """create all required directories if they do not already exist"""
+    """
+    create all required directories if they do not already exist
+    """
 
     try:
         for directory in dirs:
@@ -68,13 +70,9 @@ def create_required_dirs(dirs: list, home: Path):
         debug_logger.error("Error in create_required_dirs: %s", e)
 
 
-# TODO: add cleanup Desktop, asks if you want to include desktop in cleanup
-# returns flag for funnels to check
-# if not clean_desktop and directory == 'Desktop', then continue
-
-
-def research_dir_funnel(home: Path):
-    """move directories to Research directory
+def research_dir_funnel(home: Path, desktop_flag: bool = False):
+    """
+    move directories to Research directory
     if they start with 'Learn', 'Study', or 'Test'
     """
 
@@ -85,6 +83,9 @@ def research_dir_funnel(home: Path):
 
         for directory in approved_home_dirs:
             if directory == "Research":
+                continue
+
+            if not desktop_flag and directory == "Desktop":
                 continue
 
             directory_path = home / directory
@@ -110,9 +111,10 @@ def research_dir_funnel(home: Path):
                 debug_logger.info(
                     "Destination path in research_dir_funnel: %s", destination_path
                 )
-                # FIXME: test before moving anything
-                # moved_dir_path = shutil.move(source_path, destination_path)
-                # debug_logger.info(f'Directory was move to {moved_dir_path}')
+                moved_dir_path = shutil.move(source_path, destination_path)
+                debug_logger.info(
+                    "Directory %s was moved to %s", source_path, moved_dir_path
+                )
 
     except EmptyDirectory as ed:
         ed.log_empty_dir_memo()
@@ -129,8 +131,9 @@ def research_dir_funnel(home: Path):
     debug_logger.info("Function completed: research_dir_funnel")
 
 
-def college_dir_funnel(home: Path):
-    """move directories to College directory
+def college_dir_funnel(home: Path, desktop_flag: bool = False):
+    """
+    move directories to College directory
     if they start with 'CS'
     """
 
@@ -141,6 +144,9 @@ def college_dir_funnel(home: Path):
 
         for directory in approved_home_dirs:
             if directory == "College":
+                continue
+
+            if not desktop_flag and directory == "Desktop":
                 continue
 
             directory_path = home / directory
@@ -160,9 +166,10 @@ def college_dir_funnel(home: Path):
                 debug_logger.info(
                     "Destination path in college_dir_funnel: %s", destination_path
                 )
-                # FIXME: test before moving anything
-                # moved_dir_path = shutil.move(source_path, destination_path)
-                # debug_logger.info(f'Directory was move to {moved_dir_path}')
+                moved_dir_path = shutil.move(source_path, destination_path)
+                debug_logger.info(
+                    "Directory %s was move to %s", source_path, moved_dir_path
+                )
 
     except EmptyDirectory as ed:
         ed.log_empty_dir_memo()
@@ -179,8 +186,9 @@ def college_dir_funnel(home: Path):
     debug_logger.info("Function completed: college_dir_funnel")
 
 
-def hackathon_dir_funnel(home: Path):
-    """move directories to Hackathon directory
+def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
+    """
+    move directories to Hackathon directory
     if they start with 'Hackathon'
     """
 
@@ -191,6 +199,9 @@ def hackathon_dir_funnel(home: Path):
 
         for directory in approved_home_dirs:
             if directory == "Hackathon":
+                continue
+
+            if not desktop_flag and directory == "Desktop":
                 continue
 
             directory_path = home / directory
@@ -213,9 +224,10 @@ def hackathon_dir_funnel(home: Path):
                 debug_logger.info(
                     "Destination path in hackathon_dir_funnel: %s", destination_path
                 )
-                # FIXME: test before moving anything
-                # moved_dir_path = shutil.move(source_path, destination_path)
-                # debug_logger.info(f'Directory was move to {moved_dir_path}')
+                moved_dir_path = shutil.move(source_path, destination_path)
+                debug_logger.info(
+                    "Directory %s was move to %s", source_path, moved_dir_path
+                )
 
     except EmptyDirectory as ed:
         ed.log_empty_dir_memo()
@@ -232,8 +244,9 @@ def hackathon_dir_funnel(home: Path):
     debug_logger.info("Function completed: hackathon_dir_funnel")
 
 
-def projects_dir_funnel(home: Path):
-    """move directories to Projects
+def projects_dir_funnel(home: Path, desktop_flag: bool = False):
+    """
+    move directories to Projects
     if they contain a .git file
     and not already in Research
     """
@@ -246,7 +259,11 @@ def projects_dir_funnel(home: Path):
         for directory in approved_home_dirs:
             if directory == "Projects":
                 continue
+
             if directory == "Research":
+                continue
+
+            if not desktop_flag and directory == "Desktop":
                 continue
 
             directory_path = home / directory
@@ -266,9 +283,10 @@ def projects_dir_funnel(home: Path):
                 debug_logger.info(
                     "Destination path in projects_dir_funnel: %s", destination_path
                 )
-                # FIXME: test before moving anything
-                # moved_dir_path = shutil.move(source_path, destination_path)
-                # debug_logger.info(f'Directory was move to {moved_dir_path}')
+                moved_dir_path = shutil.move(source_path, destination_path)
+                debug_logger.info(
+                    "Directory %s was move to %s", source_path, moved_dir_path
+                )
 
     except EmptyDirectory as ed:
         ed.log_empty_dir_memo()
@@ -285,8 +303,9 @@ def projects_dir_funnel(home: Path):
     debug_logger.info("Function completed: projects_dir_funnel")
 
 
-def backups_dir_funnel(home: Path):
-    """move files to Backups
+def backups_dir_funnel(home: Path, desktop_flag: bool = False):
+    """
+    move files to Backups
     if they contain 'backup' in the filename
     """
 
@@ -296,6 +315,9 @@ def backups_dir_funnel(home: Path):
             raise EmptyDirectory(debug_logger, home, backups_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
+            if not desktop_flag and directory == "Desktop":
+                continue
+
             directory_path = home / directory
             approved_files = get_non_hidden_files(directory_path)
             backup_files = [file for file in approved_files if "backup" in file]
@@ -312,9 +334,8 @@ def backups_dir_funnel(home: Path):
                 debug_logger.info(
                     "Destination path in backups_dir_funnel: %s", destination_path
                 )
-                # FIXME: test before moving
-                # move files to Backups
-                # moved_dir_path = shutil.move(source_path, destination_path)
+                moved_dir_path = shutil.move(source_path, destination_path)
+                debug_logger.info("File %s moved to %s", source_path, moved_dir_path)
 
     except EmptyDirectory as ed:
         ed.log_empty_dir_memo()
@@ -332,7 +353,8 @@ def backups_dir_funnel(home: Path):
 
 
 def cleanup_downloads_dir(home: Path):
-    """clean up Downloads directory by moving files
+    """
+    clean up Downloads directory by moving files
     based on their file extension to other directories
     """
 
@@ -351,7 +373,6 @@ def cleanup_downloads_dir(home: Path):
             file_ext = Path(file).suffix
             for directory, ext_list in funnel_dir_ext_map.items():
                 if file_ext in ext_list:
-                    # FIXME: move to dir after testing
                     source_path = home / "Downloads" / file
                     destination_path = home / directory
                     debug_logger.info(
@@ -360,6 +381,10 @@ def cleanup_downloads_dir(home: Path):
                     debug_logger.info(
                         "Destination path in cleanup_downloads_dir: %s",
                         destination_path,
+                    )
+                    moved_dir_path = shutil.move(source_path, destination_path)
+                    debug_logger.info(
+                        "File %s moved to %s", source_path, moved_dir_path
                     )
 
                     break
@@ -376,45 +401,53 @@ def cleanup_downloads_dir(home: Path):
     debug_logger.info("Function completed: cleanup_downloads_dir")
 
 
-# TODO: check if user wants compressed files in downloads deleted
-def del_zip_files():
-    """TODO: add docstring"""
-    pass
+def del_zip_files(home: Path, del_flag: bool = False):
+    """
+    if delete flag is True, delete the zip files in Downloads
+    """
+
+    if del_flag:
+        try:
+            directory_path = home / "Desktop"
+            downloads_files = get_non_hidden_files(directory_path)
+
+            def is_zip_file(file):
+                if ".zip" in file:
+                    return True
+                if ".deb" in file:
+                    return True
+                if ".tar.gz" in file:
+                    return True
+                if ".tar.bz2" in file:
+                    return True
+                return False
+
+            zip_files = filter(is_zip_file, downloads_files)
+            print(*zip_files)
+            is_sure = input("Are you sure you want to delete these zip files? (y/n)")
+
+            while is_sure != "y" or is_sure != "Y" or is_sure != "n" or is_sure != "N":
+                if is_sure == "n" or is_sure == "N":
+                    break
+
+                if is_sure == "y" or is_sure == "Y":
+                    for file in zip_files:
+                        os.remove(file)
+                        print(f"File: {file} removed")
+                        debug_logger.info("File: %s removed", file)
+
+                    break
+
+                print("Invalid entry.")
+                is_sure = input(
+                    "Are you sure you want to delete these zip files? (y/n)"
+                )
+
+        except OSError as oe:
+            debug_logger.error("Deletion Issue, OSError: %s", oe)
 
 
 if __name__ == "__main__":
-    my_dirs = [
-        "Projects",
-        "Hackathons",
-        "Documents",
-        "Desktop",
-        "Fonts",
-        "Templates",
-        "Hacking",
-        "Powerhouse_Vault",
-        "Obsidian_Plugin_Sandbox",
-        "Pictures",
-        "Music",
-        "Downloads",
-        "Arduino",
-        "anaconda3",
-        "Videos",
-        "Backups",
-        "Research",
-        "College",
-    ]
-
-    # initial run test
-    test_path = Path.home() / "Test_FO"
-
-    create_required_dirs(my_dirs, test_path)
-
-    research_dir_funnel(test_path)
-    college_dir_funnel(test_path)
-    hackathon_dir_funnel(test_path)
-    projects_dir_funnel(test_path)
-    backups_dir_funnel(test_path)
-    cleanup_downloads_dir(test_path)
 
     # home_path = Path.home()
     # debug_logger.info('Home path created: %s', home_path)
