@@ -2,14 +2,13 @@
 
 import logging
 import sys
-import typing
 
 
-# setup debug logger for dev -> debug.log
-def get_debug_logger(file: typing.TextIO) -> logging.Logger:
+# setup debug logger for dev -> sys.stderr
+def get_debug_logger() -> logging.Logger:
     """TODO: add docstring"""
     debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    debug_handler = logging.StreamHandler(file)
+    debug_handler = logging.StreamHandler(sys.stderr)
     debug_handler.setFormatter(debug_formatter)
 
     debug_logger = logging.getLogger("Debug Logger")
@@ -19,13 +18,13 @@ def get_debug_logger(file: typing.TextIO) -> logging.Logger:
     return debug_logger
 
 
-# setup test logger -> test.log
-def get_test_logger(file: typing.TextIO) -> logging.Logger:
+# setup test logger -> sys.stderr
+def get_test_logger() -> logging.Logger:
     """TODO: add docstring"""
     test_formatter = logging.Formatter(
         "%(asctime)s - TEST - %(levelname)s - %(message)s"
     )
-    test_handler = logging.StreamHandler(file)
+    test_handler = logging.StreamHandler(sys.stderr)
     test_handler.setFormatter(test_formatter)
 
     test_logger = logging.getLogger("Test Logger")

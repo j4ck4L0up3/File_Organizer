@@ -5,11 +5,10 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from logger import get_debug_logger
-from special_exceptions import EmptyDirectory
+from app.special_exceptions import EmptyDirectory
+from tests.logger import get_debug_logger
 
-with open("./debug.log", "wt", encoding="utf-8") as debug_log_file:
-    debug_logger = get_debug_logger(debug_log_file)
+debug_logger = get_debug_logger()
 
 
 def get_non_hidden_dirs(directory: Optional[Path] = None) -> list:
@@ -62,12 +61,11 @@ def create_required_dirs(dirs: list, home: Path):
         debug_logger.error(
             "FileExistsError occurred with checking in create_required_dirs: %s", fee
         )
+        raise
 
     except OSError as ose:
         debug_logger.error("OSError in create_required_dirs: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in create_required_dirs: %s", e)
+        raise
 
 
 def research_dir_funnel(home: Path, desktop_flag: bool = False):
@@ -78,8 +76,8 @@ def research_dir_funnel(home: Path, desktop_flag: bool = False):
 
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
-        if approved_home_dirs == []:
-            raise EmptyDirectory(debug_logger, home, research_dir_funnel.__name__)
+        if approved_home_dirs == [] or len(approved_home_dirs) == 0:
+            raise EmptyDirectory(home, research_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
             if directory == "Research":
@@ -107,26 +105,31 @@ def research_dir_funnel(home: Path, desktop_flag: bool = False):
 
                 source_path = home / directory / item
                 destination_path = home / "Research"
-                debug_logger.info("Source path in research_dir_funnel: %s", source_path)
-                debug_logger.info(
-                    "Destination path in research_dir_funnel: %s", destination_path
-                )
-                moved_dir_path = shutil.move(source_path, destination_path)
-                debug_logger.info(
-                    "Directory %s was moved to %s", source_path, moved_dir_path
-                )
+
+                if not (destination_path / item).exists():
+                    debug_logger.info(
+                        "Source path in research_dir_funnel: %s", source_path
+                    )
+                    debug_logger.info(
+                        "Destination path in research_dir_funnel: %s", destination_path
+                    )
+                    moved_dir_path = shutil.move(source_path, destination_path)
+                    debug_logger.info(
+                        "Directory %s was moved to %s", source_path, moved_dir_path
+                    )
+
+                else:
+                    raise FileExistsError(
+                        f"Cannot move {item} into {destination_path} because it already exists"
+                    )
 
     except EmptyDirectory as ed:
-        ed.log_empty_dir_memo()
+        debug_logger.error("EmptyDirectory in research_dir_funnel: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in research_dir_funnel: %s", fee)
-
-    except OSError as ose:
-        debug_logger.error("OSError in research_dir_funnel: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in research_dir_funnel: %s", e)
+        raise
 
     debug_logger.info("Function completed: research_dir_funnel")
 
@@ -140,7 +143,7 @@ def college_dir_funnel(home: Path, desktop_flag: bool = False):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         if approved_home_dirs == []:
-            raise EmptyDirectory(debug_logger, home, college_dir_funnel.__name__)
+            raise EmptyDirectory(home, college_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
             if directory == "College":
@@ -162,26 +165,29 @@ def college_dir_funnel(home: Path, desktop_flag: bool = False):
 
                 source_path = home / directory / item
                 destination_path = home / "College"
-                debug_logger.info("Source path in college_dir_funnel: %s", source_path)
-                debug_logger.info(
-                    "Destination path in college_dir_funnel: %s", destination_path
-                )
-                moved_dir_path = shutil.move(source_path, destination_path)
-                debug_logger.info(
-                    "Directory %s was move to %s", source_path, moved_dir_path
-                )
+                if not (destination_path / item).exists():
+                    debug_logger.info(
+                        "Source path in college_dir_funnel: %s", source_path
+                    )
+                    debug_logger.info(
+                        "Destination path in college_dir_funnel: %s", destination_path
+                    )
+                    moved_dir_path = shutil.move(source_path, destination_path)
+                    debug_logger.info(
+                        "Directory %s was move to %s", source_path, moved_dir_path
+                    )
+                else:
+                    raise FileExistsError(
+                        f"Cannot move {item} into {destination_path} because it already exists"
+                    )
 
     except EmptyDirectory as ed:
-        ed.log_empty_dir_memo()
+        debug_logger.error("EmptyDirectory in college_dir_funnel: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in college_dir_funnel: %s", fee)
-
-    except OSError as ose:
-        debug_logger.error("OSError in college_dir_funnel: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in college_dir_funnel: %s", e)
+        raise
 
     debug_logger.info("Function completed: college_dir_funnel")
 
@@ -195,7 +201,7 @@ def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         if approved_home_dirs == []:
-            raise EmptyDirectory(debug_logger, home, hackathon_dir_funnel.__name__)
+            raise EmptyDirectory(home, hackathon_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
             if directory == "Hackathon":
@@ -230,16 +236,16 @@ def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
                 )
 
     except EmptyDirectory as ed:
-        ed.log_empty_dir_memo()
+        debug_logger.error("EmptyDirectory in hackathon_dir_funnel: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in hackathon_dir_funnel: %s", fee)
+        raise
 
     except OSError as ose:
         debug_logger.error("OSError in hackthon_dir_funnel: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in hackathon_dir_funnel: %s", e)
+        raise
 
     debug_logger.info("Function completed: hackathon_dir_funnel")
 
@@ -254,7 +260,7 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         if approved_home_dirs == []:
-            raise EmptyDirectory(debug_logger, home, projects_dir_funnel.__name__)
+            raise EmptyDirectory(home, projects_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
             if directory == "Projects":
@@ -289,16 +295,16 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
                 )
 
     except EmptyDirectory as ed:
-        ed.log_empty_dir_memo()
+        debug_logger.error("EmptyDirectory in projects_dir_funnel: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in projects_dir_funnel: %s", fee)
+        raise
 
     except OSError as ose:
         debug_logger.error("OSError in projects_dir_funnel: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in projects_dir_funnel: %s", e)
+        raise
 
     debug_logger.info("Function completed: projects_dir_funnel")
 
@@ -312,7 +318,7 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
     try:
         approved_home_dirs = get_non_hidden_dirs(home)
         if approved_home_dirs == []:
-            raise EmptyDirectory(debug_logger, home, backups_dir_funnel.__name__)
+            raise EmptyDirectory(home, backups_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
             if not desktop_flag and directory == "Desktop":
@@ -338,16 +344,16 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
                 debug_logger.info("File %s moved to %s", source_path, moved_dir_path)
 
     except EmptyDirectory as ed:
-        ed.log_empty_dir_memo()
+        debug_logger.error("EmptyDirectory in backups_dir_funnel: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in backups_dir_funnel: %s", fee)
+        raise
 
     except OSError as ose:
         debug_logger.error("OSError in backups_dir_funnel: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in backups_dir_funnel: %s", e)
+        raise
 
     debug_logger.info("Function completed: backups_dir_funnel")
 
@@ -391,12 +397,11 @@ def cleanup_downloads_dir(home: Path):
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in cleanup_downloads_dir: %s", fee)
+        raise
 
     except OSError as ose:
         debug_logger.error("OSError in cleanup_downloads_dir: %s", ose)
-
-    except Exception as e:
-        debug_logger.error("Error in cleanup_downloads_dir: %s", e)
+        raise
 
     debug_logger.info("Function completed: cleanup_downloads_dir")
 
@@ -411,6 +416,7 @@ def del_zip_files(home: Path, del_flag: bool = False):
             directory_path = home / "Desktop"
             downloads_files = get_non_hidden_files(directory_path)
 
+            # TODO: change into match-case
             def is_zip_file(file):
                 if ".zip" in file:
                     return True
@@ -445,23 +451,4 @@ def del_zip_files(home: Path, del_flag: bool = False):
 
         except OSError as oe:
             debug_logger.error("Deletion Issue, OSError: %s", oe)
-
-
-if __name__ == "__main__":
-
-    # home_path = Path.home()
-    # debug_logger.info('Home path created: %s', home_path)
-
-    #  create required dirs
-    # create_required_dirs(my_dirs, home_path)
-
-    # directory funnels
-    # research_dir_funnel(home_path)
-    # college_dir_funnel(home_path)
-    # hackathon_dir_funnel(home_path)
-    # projects_dir_funnel(home_path)
-    # backups_dir_funnel(home_path)
-    # cleanup_downloads_dir(home_path)
-
-    # close debug log file
-    debug_log_file.close()
+            raise
