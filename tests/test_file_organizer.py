@@ -35,12 +35,18 @@ def setup_tmp_path(tmp_path):
     other_dirs = [
         "CS_1250",
         "CSM_Assignments",
-        "Hackathon_Velocity",
+        "Hackathon_Wrong1",
+        "Hackathon_Wrong2",
         "Random_Dir",
         "Random_Dir2",
         "Learn_Wrong1",
         "Study_Wrong2",
         "Test_Wrong3",
+    ]
+
+    hackathon_dirs = [
+        "Hackathon_Velocity",
+        "Hackathon_Yeti",
     ]
 
     research_dirs = [
@@ -68,7 +74,7 @@ def setup_tmp_path(tmp_path):
         i = randint(0, len(root_dirs) - 1)
         (tmp_path / root_dirs[i] / other).mkdir()
 
-    for git_dir in project_dirs + research_dirs:
+    for git_dir in project_dirs + research_dirs + hackathon_dirs:
         i = randint(0, len(root_dirs) - 1)
         (tmp_path / root_dirs[i] / git_dir).mkdir()
         (tmp_path / root_dirs[i] / git_dir / ".git").touch()
@@ -296,7 +302,7 @@ def test_research_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
             fo.research_dir_funnel(home, desktop_flag)
 
 
-# TODO: college_dir_funnel tests (see research_dir_funnel tests)
+# college_dir_funnel tests
 def test_college_dir_funnel_empty_home(tmp_path, monkeypatch):
     monkeypatch.setattr("app.file_organizer.get_non_hidden_dirs", lambda x: [])
 
@@ -373,3 +379,83 @@ def test_college_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
     if remaining_dirs:
         with pytest.raises(FileExistsError):
             fo.college_dir_funnel(home)
+
+
+# TODO: hackathon_dir_funnel tests
+def test_hackathon_dir_funnel_empty_home(tmp_path, monkeypatch):
+    monkeypatch.setattr("app.file_organizer.get_non_hidden_dirs", lambda x: [])
+
+    with pytest.raises(EmptyDirectory):
+        fo.hackathon_dir_funnel(tmp_path)
+
+
+def test_hackathon_dir_funnel_with_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    expected_dirs = [
+        "Hackathon_Velocity",
+        "Hackathon_Yeti",
+    ]
+    desktop_flag = True
+
+    fo.hackathon_dir_funnel(home, desktop_flag)
+
+    for exp_dir in expected_dirs:
+        assert (home / "Hackathons" / exp_dir).exists()
+
+
+def test_hackathon_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    existing_dirs = [
+        "Hackathon_Velocity",
+        "Hackathon_Yeti",
+    ]
+    desktop_flag = True
+
+    for ex_dir in existing_dirs:
+        if not (home / "Hackathons" / ex_dir).exists():
+            (home / "Hackathons" / ex_dir).mkdir()
+
+    with pytest.raises(FileExistsError):
+        fo.hackathon_dir_funnel(home, desktop_flag)
+
+
+def test_hackathon_dir_funnel_without_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    desktop = home / "Desktop"
+    excluded_dirs = []
+    expected_dirs = [
+        "Hackathon_Velocity",
+        "Hackathon_Yeti",
+    ]
+
+    for item in desktop.iterdir():
+        excluded_dirs.append(str(item.stem))
+
+    expected_dirs = list(set(expected_dirs) - set(excluded_dirs))
+
+    fo.hackathon_dir_funnel(home)
+    if expected_dirs:
+        for exp_dir in expected_dirs:
+            assert (home / "Hackathons" / exp_dir).exists()
+
+
+def test_hackathon_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    desktop = home / "Desktop"
+    excluded_dirs = []
+    existing_dirs = [
+        "Hackathon_Velocity",
+        "Hackathon_Yeti",
+    ]
+
+    for item in desktop.iterdir():
+        excluded_dirs.append(str(item.stem))
+
+    for ex_dir in existing_dirs:
+        if not (home / "Hackathons" / ex_dir).exists():
+            (home / "Hackathons" / ex_dir).mkdir()
+
+    remaining_dirs = list(set(existing_dirs) - set(excluded_dirs))
+    if remaining_dirs:
+        with pytest.raises(FileExistsError):
+            fo.hackathon_dir_funnel(home)

@@ -194,7 +194,7 @@ def college_dir_funnel(home: Path, desktop_flag: bool = False):
 
 def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
     """
-    move directories to Hackathon directory
+    move directories to Hackathons directory
     if they start with 'Hackathon'
     """
 
@@ -204,7 +204,7 @@ def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
             raise EmptyDirectory(home, hackathon_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
-            if directory == "Hackathon":
+            if directory == "Hackathons":
                 continue
 
             if not desktop_flag and directory == "Desktop":
@@ -218,22 +218,29 @@ def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
 
             for item in approved_sub_dirs:
                 has_git_file = Path.exists(home / directory / item / ".git")
-                is_hackathon = item.startswith("Hackathon") and has_git_file
+                is_hackathon = item.startswith("Hackathon")
+                is_hackathon = is_hackathon and has_git_file
                 if not is_hackathon:
                     continue
 
                 source_path = home / directory / item
-                destination_path = home / "Hackathon"
-                debug_logger.info(
-                    "Source path in hackathon_dir_funnel: %s", source_path
-                )
-                debug_logger.info(
-                    "Destination path in hackathon_dir_funnel: %s", destination_path
-                )
-                moved_dir_path = shutil.move(source_path, destination_path)
-                debug_logger.info(
-                    "Directory %s was move to %s", source_path, moved_dir_path
-                )
+                destination_path = home / "Hackathons"
+
+                if not (destination_path / item).exists():
+                    debug_logger.info(
+                        "Source path in hackathon_dir_funnel: %s", source_path
+                    )
+                    debug_logger.info(
+                        "Destination path in hackathon_dir_funnel: %s", destination_path
+                    )
+                    moved_dir_path = shutil.move(source_path, destination_path)
+                    debug_logger.info(
+                        "Directory %s was move to %s", source_path, moved_dir_path
+                    )
+                else:
+                    raise FileExistsError(
+                        f"Cannot move {item} into {destination_path} because it already exists"
+                    )
 
     except EmptyDirectory as ed:
         debug_logger.error("EmptyDirectory in hackathon_dir_funnel: %s", ed)
@@ -241,10 +248,6 @@ def hackathon_dir_funnel(home: Path, desktop_flag: bool = False):
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in hackathon_dir_funnel: %s", fee)
-        raise
-
-    except OSError as ose:
-        debug_logger.error("OSError in hackthon_dir_funnel: %s", ose)
         raise
 
     debug_logger.info("Function completed: hackathon_dir_funnel")
