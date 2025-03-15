@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 """Tests for file_organizer"""
 
 from pathlib import Path
@@ -381,7 +383,7 @@ def test_college_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
             fo.college_dir_funnel(home)
 
 
-# TODO: hackathon_dir_funnel tests
+# hackathon_dir_funnel tests
 def test_hackathon_dir_funnel_empty_home(tmp_path, monkeypatch):
     monkeypatch.setattr("app.file_organizer.get_non_hidden_dirs", lambda x: [])
 
@@ -459,3 +461,114 @@ def test_hackathon_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
     if remaining_dirs:
         with pytest.raises(FileExistsError):
             fo.hackathon_dir_funnel(home)
+
+
+# projects_dir_funnel tests
+def test_projects_dir_funnel_empty_home(tmp_path, monkeypatch):
+    monkeypatch.setattr("app.file_organizer.get_non_hidden_dirs", lambda x: [])
+
+    with pytest.raises(EmptyDirectory):
+        fo.projects_dir_funnel(tmp_path)
+
+
+def test_projects_dir_funnel_with_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    research = home / "Research"
+    expected_research_dirs = []
+    expected_dirs = [
+        "Terminal_Search",
+        "OneStopQR",
+        "ElectricGuitar",
+        "Integer_Game",
+    ]
+    desktop_flag = True
+
+    for res_dir in research.iterdir():
+        expected_research_dirs.append(res_dir)
+
+    fo.projects_dir_funnel(home, desktop_flag)
+
+    for res_dir in expected_research_dirs:
+        assert (home / "Research" / res_dir).exists()
+
+    for exp_dir in expected_dirs:
+        assert (home / "Projects" / exp_dir).exists()
+
+
+def test_projects_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    research = home / "Research"
+    existing_dirs = [
+        "Terminal_Search",
+        "OneStopQR",
+        "ElectricGuitar",
+        "Integer_Game",
+    ]
+    excluded_dirs = []
+    desktop_flag = True
+
+    for res_dir in research.iterdir():
+        excluded_dirs.append(str(res_dir.stem))
+
+    for ex_dir in existing_dirs:
+        (home / "Projects" / ex_dir).mkdir()
+
+    with pytest.raises(FileExistsError):
+        fo.projects_dir_funnel(home, desktop_flag)
+
+
+def test_projects_dir_funnel_without_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    research = home / "Research"
+    desktop = home / "Desktop"
+    excluded_dirs = []
+    expected_dirs = [
+        "Terminal_Search",
+        "OneStopQR",
+        "ElectricGuitar",
+        "Integer_Game",
+    ]
+
+    for item in desktop.iterdir():
+        excluded_dirs.append(str(item.stem))
+
+    for res_dir in research.iterdir():
+        excluded_dirs.append(str(res_dir.stem))
+
+    expected_dirs = list(set(expected_dirs) - set(excluded_dirs))
+
+    fo.projects_dir_funnel(home)
+    if expected_dirs:
+        for exp_dir in expected_dirs:
+            assert (home / "Projects" / exp_dir).exists()
+
+
+def test_projects_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
+    home = setup_tmp_path
+    research = home / "Research"
+    desktop = home / "Desktop"
+    excluded_dirs = []
+    existing_dirs = [
+        "Terminal_Search",
+        "OneStopQR",
+        "ElectricGuitar",
+        "Integer_Game",
+    ]
+
+    for item in desktop.iterdir():
+        excluded_dirs.append(str(item.stem))
+
+    for res_dir in research.iterdir():
+        excluded_dirs.append(str(res_dir.stem))
+
+    for ex_dir in existing_dirs:
+        if not (home / "Projects" / ex_dir).exists():
+            (home / "Projects" / ex_dir).mkdir()
+
+    remaining_dirs = list(set(existing_dirs) - set(excluded_dirs))
+    if remaining_dirs:
+        with pytest.raises(FileExistsError):
+            fo.projects_dir_funnel(home)
+
+
+# TODO: backups dir funnel tests

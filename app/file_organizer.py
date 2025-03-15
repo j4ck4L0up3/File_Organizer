@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -288,14 +289,21 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
 
                 source_path = home / directory / item
                 destination_path = home / "Projects"
-                debug_logger.info("Source path in projects_dir_funnel: %s", source_path)
-                debug_logger.info(
-                    "Destination path in projects_dir_funnel: %s", destination_path
-                )
-                moved_dir_path = shutil.move(source_path, destination_path)
-                debug_logger.info(
-                    "Directory %s was move to %s", source_path, moved_dir_path
-                )
+                if not (destination_path / item).exists():
+                    debug_logger.info(
+                        "Source path in projects_dir_funnel: %s", source_path
+                    )
+                    debug_logger.info(
+                        "Destination path in projects_dir_funnel: %s", destination_path
+                    )
+                    moved_dir_path = shutil.move(source_path, destination_path)
+                    debug_logger.info(
+                        "Directory %s was move to %s", source_path, moved_dir_path
+                    )
+                else:
+                    raise FileExistsError(
+                        f"Cannot move {item} into {destination_path} because it already exists"
+                    )
 
     except EmptyDirectory as ed:
         debug_logger.error("EmptyDirectory in projects_dir_funnel: %s", ed)
@@ -305,17 +313,13 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
         debug_logger.error("FileExistsError in projects_dir_funnel: %s", fee)
         raise
 
-    except OSError as ose:
-        debug_logger.error("OSError in projects_dir_funnel: %s", ose)
-        raise
-
     debug_logger.info("Function completed: projects_dir_funnel")
 
 
 def backups_dir_funnel(home: Path, desktop_flag: bool = False):
     """
     move files to Backups
-    if they contain 'backup' in the filename
+    if they contain 'backup' or 'recovery' in the filename
     """
 
     try:
@@ -329,7 +333,11 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
 
             directory_path = home / directory
             approved_files = get_non_hidden_files(directory_path)
-            backup_files = [file for file in approved_files if "backup" in file]
+            backup_files = [
+                file
+                for file in approved_files
+                if "backup" in file or "recovery" in file
+            ]
             debug_logger.debug("Backup files to be moved: %s", backup_files)
 
             if backup_files == []:
@@ -419,7 +427,6 @@ def del_zip_files(home: Path, del_flag: bool = False):
             directory_path = home / "Desktop"
             downloads_files = get_non_hidden_files(directory_path)
 
-            # TODO: change into match-case
             def is_zip_file(file):
                 if ".zip" in file:
                     return True
@@ -435,22 +442,17 @@ def del_zip_files(home: Path, del_flag: bool = False):
             print(*zip_files)
             is_sure = input("Are you sure you want to delete these zip files? (y/n)")
 
-            while is_sure != "y" or is_sure != "Y" or is_sure != "n" or is_sure != "N":
-                if is_sure == "n" or is_sure == "N":
-                    break
+            if is_sure in ("y", "Y"):
+                for file in zip_files:
+                    os.remove(file)
+                    print(f"File: {file} removed")
+                    debug_logger.info("File: %s removed", file)
 
-                if is_sure == "y" or is_sure == "Y":
-                    for file in zip_files:
-                        os.remove(file)
-                        print(f"File: {file} removed")
-                        debug_logger.info("File: %s removed", file)
+            else:
+                sys.exit()
 
-                    break
-
-                print("Invalid entry.")
-                is_sure = input(
-                    "Are you sure you want to delete these zip files? (y/n)"
-                )
+        except SystemExit as se:
+            debug_logger.info("System exited program: %s", se)
 
         except OSError as oe:
             debug_logger.error("Deletion Issue, OSError: %s", oe)
