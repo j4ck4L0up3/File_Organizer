@@ -11,7 +11,7 @@ import app.file_organizer as fo
 from app.special_exceptions import EmptyDirectory
 
 
-@pytest.fixture
+@pytest.fixture()
 def setup_tmp_path(tmp_path):
     root_dirs = [
         "Projects",
@@ -44,17 +44,21 @@ def setup_tmp_path(tmp_path):
         "Learn_Wrong1",
         "Study_Wrong2",
         "Test_Wrong3",
+        "teehee-key.txt",
+        "backup-recovery.pdf",
     ]
 
     hackathon_dirs = [
         "Hackathon_Velocity",
         "Hackathon_Yeti",
+        "key1.txt",
     ]
 
     research_dirs = [
         "Learn_Go",
         "Test_Selenium",
         "Study_Javascript",
+        "recovery1.txt",
     ]
 
     project_dirs = [
@@ -62,11 +66,15 @@ def setup_tmp_path(tmp_path):
         "OneStopQR",
         "ElectricGuitar",
         "Integer_Game",
+        "backup1.txt",
     ]
 
     desktop_dirs = [
         "project1",
         "project2",
+        "recovery-key.txt",
+        "backup.txt",
+        "backup-recovery-key.txt",
     ]
 
     for directory in root_dirs:
@@ -228,7 +236,7 @@ def test_research_dir_funnel_empty_home(tmp_path, monkeypatch):
         fo.research_dir_funnel(tmp_path)
 
 
-def test_research_dir_funnel_with_desktop(setup_tmp_path):
+def test_research_dir_funnel_with_desktop(tmp_path):
     expected_dirs = [
         "Learn_Go",
         "Test_Selenium",
@@ -236,15 +244,15 @@ def test_research_dir_funnel_with_desktop(setup_tmp_path):
     ]
     desktop_flag = True
 
-    home = setup_tmp_path
+    home = tmp_path
     fo.research_dir_funnel(home, desktop_flag)
 
     for exp_dir in expected_dirs:
         assert (home / "Research" / exp_dir).exists()
 
 
-def test_research_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_research_dir_funnel_existing_dirs_with_desktop(tmp_path):
+    home = tmp_path
     existing_dirs = [
         "Learn_Go",
         "Test_Selenium",
@@ -260,8 +268,8 @@ def test_research_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
         fo.research_dir_funnel(home, desktop_flag)
 
 
-def test_research_dir_funnel_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_research_dir_funnel_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     expected_dirs = [
@@ -280,8 +288,8 @@ def test_research_dir_funnel_without_desktop(setup_tmp_path):
         assert (home / "Research" / exp_dir).exists()
 
 
-def test_research_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_research_dir_funnel_existing_dirs_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     existing_dirs = [
@@ -312,8 +320,8 @@ def test_college_dir_funnel_empty_home(tmp_path, monkeypatch):
         fo.college_dir_funnel(tmp_path)
 
 
-def test_college_dir_funnel_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_college_dir_funnel_with_desktop(tmp_path):
+    home = tmp_path
     expected_dirs = [
         "CS_1250",
         "CSM_Assignments",
@@ -326,8 +334,8 @@ def test_college_dir_funnel_with_desktop(setup_tmp_path):
         assert (home / "College" / exp_dir).exists()
 
 
-def test_college_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_college_dir_funnel_existing_dirs_with_desktop(tmp_path):
+    home = tmp_path
     existing_dirs = [
         "CS_1250",
         "CSM_Assignments",
@@ -342,8 +350,8 @@ def test_college_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
         fo.college_dir_funnel(home, desktop_flag)
 
 
-def test_college_dir_funnel_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_college_dir_funnel_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     expected_dirs = [
@@ -361,8 +369,8 @@ def test_college_dir_funnel_without_desktop(setup_tmp_path):
         assert (home / "College" / exp_dir).exists()
 
 
-def test_college_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_college_dir_funnel_existing_dirs_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     existing_dirs = [
@@ -391,8 +399,8 @@ def test_hackathon_dir_funnel_empty_home(tmp_path, monkeypatch):
         fo.hackathon_dir_funnel(tmp_path)
 
 
-def test_hackathon_dir_funnel_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_hackathon_dir_funnel_with_desktop(tmp_path):
+    home = tmp_path
     expected_dirs = [
         "Hackathon_Velocity",
         "Hackathon_Yeti",
@@ -405,8 +413,8 @@ def test_hackathon_dir_funnel_with_desktop(setup_tmp_path):
         assert (home / "Hackathons" / exp_dir).exists()
 
 
-def test_hackathon_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_hackathon_dir_funnel_existing_dirs_with_desktop(tmp_path):
+    home = tmp_path
     existing_dirs = [
         "Hackathon_Velocity",
         "Hackathon_Yeti",
@@ -421,8 +429,8 @@ def test_hackathon_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
         fo.hackathon_dir_funnel(home, desktop_flag)
 
 
-def test_hackathon_dir_funnel_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_hackathon_dir_funnel_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     expected_dirs = [
@@ -441,8 +449,8 @@ def test_hackathon_dir_funnel_without_desktop(setup_tmp_path):
             assert (home / "Hackathons" / exp_dir).exists()
 
 
-def test_hackathon_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_hackathon_dir_funnel_existing_dirs_without_desktop(tmp_path):
+    home = tmp_path
     desktop = home / "Desktop"
     excluded_dirs = []
     existing_dirs = [
@@ -471,8 +479,8 @@ def test_projects_dir_funnel_empty_home(tmp_path, monkeypatch):
         fo.projects_dir_funnel(tmp_path)
 
 
-def test_projects_dir_funnel_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_projects_dir_funnel_with_desktop(tmp_path):
+    home = tmp_path
     research = home / "Research"
     expected_research_dirs = []
     expected_dirs = [
@@ -495,8 +503,8 @@ def test_projects_dir_funnel_with_desktop(setup_tmp_path):
         assert (home / "Projects" / exp_dir).exists()
 
 
-def test_projects_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_projects_dir_funnel_existing_dirs_with_desktop(tmp_path):
+    home = tmp_path
     research = home / "Research"
     existing_dirs = [
         "Terminal_Search",
@@ -517,8 +525,8 @@ def test_projects_dir_funnel_existing_dirs_with_desktop(setup_tmp_path):
         fo.projects_dir_funnel(home, desktop_flag)
 
 
-def test_projects_dir_funnel_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_projects_dir_funnel_without_desktop(tmp_path):
+    home = tmp_path
     research = home / "Research"
     desktop = home / "Desktop"
     excluded_dirs = []
@@ -543,8 +551,8 @@ def test_projects_dir_funnel_without_desktop(setup_tmp_path):
             assert (home / "Projects" / exp_dir).exists()
 
 
-def test_projects_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
-    home = setup_tmp_path
+def test_projects_dir_funnel_existing_dirs_without_desktop(tmp_path):
+    home = tmp_path
     research = home / "Research"
     desktop = home / "Desktop"
     excluded_dirs = []
@@ -572,3 +580,14 @@ def test_projects_dir_funnel_existing_dirs_without_desktop(setup_tmp_path):
 
 
 # TODO: backups dir funnel tests
+def test_backups_dir_funnel_empty_home(tmp_path, monkeypatch):
+    monkeypatch.setattr("app.file_organizer.get_non_hidden_dirs", lambda x: [])
+
+    with pytest.raises(EmptyDirectory):
+        fo.backups_dir_funnel(tmp_path)
+
+
+def test_backups_dir_funnel_with_desktop(tmp_path):
+    home = tmp_path
+    backups = home / "Backups"
+    expected_files =

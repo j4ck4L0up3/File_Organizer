@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 def main():
     my_dirs = [
         "Projects",

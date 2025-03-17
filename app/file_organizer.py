@@ -336,7 +336,7 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
             backup_files = [
                 file
                 for file in approved_files
-                if "backup" in file or "recovery" in file
+                if "backup" in file or "recovery" in file or "key" in file
             ]
             debug_logger.debug("Backup files to be moved: %s", backup_files)
 
