@@ -12,9 +12,11 @@ def format_menu(options, left_width, right_width):
 
 
 OPTIONS = {
-    "-d [optstring], --desktop='optstring'": "set False by default. set True to clear your Desktop.",
-    "-v, --verbose": "show logs",
+    "-d, --desktop-flag BOOL": "set False by default. set True to clear your Desktop.",
+    "-t, --trash-flag BOOL": "set False by default. set True to automatically delete compressed files from Downloads.",
+    "-v, --verbose": "show verbose output",
+    "-l, --log FILE": "output logs to a file",
     "-h, --help": "show menu",
 }
 
-format_menu(OPTIONS, 50, 5)
+# format_menu(OPTIONS, 50, 5)
