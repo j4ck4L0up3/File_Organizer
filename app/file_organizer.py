@@ -2,9 +2,9 @@
 
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 from app.special_exceptions import EmptyDirectory
 from tests.logger import get_debug_logger
@@ -12,7 +12,7 @@ from tests.logger import get_debug_logger
 debug_logger = get_debug_logger()
 
 
-def get_non_hidden_dirs(directory: Optional[Path] = None) -> list:
+def get_non_hidden_dirs(directory: Path | None = None) -> list[str]:
     """get list of non-hidden directories"""
 
     if directory is None:
@@ -21,14 +21,16 @@ def get_non_hidden_dirs(directory: Optional[Path] = None) -> list:
     approved_items = [
         item for item in os.listdir(directory) if not item.startswith(".")
     ]
-    approved_dirs = [
-        item for item in approved_items if os.path.isdir(Path(directory, item))
-    ]
-    debug_logger.debug("Approved Directories: %s", approved_dirs)
+    approved_dirs = [item for item in approved_items if Path(directory, item).is_dir()]
+    debug_logger.debug("Approved Directories in %s: %s", directory, approved_dirs)
+    actual_dirs = subprocess.run(
+        ["ls", directory], capture_output=True, text=True, check=True
+    )
+    debug_logger.debug("Actual Directories in %s: %s", directory, actual_dirs.stdout)
     return approved_dirs
 
 
-def get_non_hidden_files(directory: Optional[Path] = None) -> list:
+def get_non_hidden_files(directory: Path | None = None) -> list[str]:
     """get list of non-hidden files"""
 
     if directory is None:
@@ -38,7 +40,7 @@ def get_non_hidden_files(directory: Optional[Path] = None) -> list:
         item for item in os.listdir(directory) if not item.startswith(".")
     ]
     approved_files = [
-        file for file in approved_items if os.path.isfile(Path(directory, file))
+        file for file in approved_items if Path(directory, file).is_file()
     ]
     debug_logger.debug("Approved Files: %s", approved_files)
     return approved_files
@@ -150,7 +152,7 @@ def college_dir_funnel(home: Path, desktop_flag: bool = False):
             if directory == "College":
                 continue
 
-            if not desktop_flag and directory == "Desktop":
+            if (not desktop_flag) and directory == "Desktop":
                 continue
 
             directory_path = home / directory
@@ -298,7 +300,7 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
                     )
                     moved_dir_path = shutil.move(source_path, destination_path)
                     debug_logger.info(
-                        "Directory %s was move to %s", source_path, moved_dir_path
+                        "Directory %s was moved to %s", source_path, moved_dir_path
                     )
                 else:
                     raise FileExistsError(
@@ -319,7 +321,7 @@ def projects_dir_funnel(home: Path, desktop_flag: bool = False):
 def backups_dir_funnel(home: Path, desktop_flag: bool = False):
     """
     move files to Backups
-    if they contain 'backup' or 'recovery' in the filename
+    if they contain 'key', 'backup', or 'recovery' in the filename
     """
 
     try:
@@ -328,7 +330,10 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
             raise EmptyDirectory(home, backups_dir_funnel.__name__)
 
         for directory in approved_home_dirs:
-            if not desktop_flag and directory == "Desktop":
+            if (not desktop_flag) and directory == "Desktop":
+                continue
+
+            if directory == "Backups":
                 continue
 
             directory_path = home / directory
@@ -351,8 +356,11 @@ def backups_dir_funnel(home: Path, desktop_flag: bool = False):
                 debug_logger.info(
                     "Destination path in backups_dir_funnel: %s", destination_path
                 )
-                moved_dir_path = shutil.move(source_path, destination_path)
-                debug_logger.info("File %s moved to %s", source_path, moved_dir_path)
+                shutil.move(source_path, destination_path)
+                debug_logger.info("File %s moved to %s", source_path, destination_path)
+                debug_logger.info(
+                    f"Current Backups directory: {get_non_hidden_files(destination_path)}"
+                )
 
     except EmptyDirectory as ed:
         debug_logger.error("EmptyDirectory in backups_dir_funnel: %s", ed)
@@ -379,9 +387,12 @@ def cleanup_downloads_dir(home: Path):
         # funnel remaining files into Documents, Pictures, Music, Videos
         downloads_path = home / "Downloads"
         downloads_files = get_non_hidden_files(downloads_path)
+        if downloads_files == []:
+            raise EmptyDirectory(downloads_path, cleanup_downloads_dir.__name__)
+
         funnel_dir_ext_map = {
             "Documents": [".pdf", ".doc", ".docx", ".txt"],
-            "Pictures": [".png", ".jpg", ".jpeg"],
+            "Pictures": [".png", ".jpg", ".jpeg", ".svg"],
             "Music": [".wav", ".mp3", ".mp4", ".ogg"],
             "Videos": [".mov", ".avi", ".wmv", ".flv", ".avchd"],
         }
@@ -399,12 +410,16 @@ def cleanup_downloads_dir(home: Path):
                         "Destination path in cleanup_downloads_dir: %s",
                         destination_path,
                     )
-                    moved_dir_path = shutil.move(source_path, destination_path)
+                    shutil.move(source_path, destination_path)
                     debug_logger.info(
-                        "File %s moved to %s", source_path, moved_dir_path
+                        "File %s moved to %s", source_path, destination_path
                     )
 
                     break
+
+    except EmptyDirectory as ed:
+        debug_logger.error("EmptyDirectory in cleanup_downloads_dir: %s", ed)
+        raise
 
     except FileExistsError as fee:
         debug_logger.error("FileExistsError in cleanup_downloads_dir: %s", fee)
@@ -424,8 +439,10 @@ def del_zip_files(home: Path, del_flag: bool = False):
 
     if del_flag:
         try:
-            directory_path = home / "Desktop"
-            downloads_files = get_non_hidden_files(directory_path)
+            downloads_path = home / "Downloads"
+            downloads_files = get_non_hidden_files(downloads_path)
+            if downloads_files == []:
+                raise EmptyDirectory(downloads_path, del_zip_files.__name__)
 
             def is_zip_file(file):
                 if ".zip" in file:
@@ -436,23 +453,27 @@ def del_zip_files(home: Path, del_flag: bool = False):
                     return True
                 if ".tar.bz2" in file:
                     return True
+                if ".tar.xz" in file:
+                    return True
                 return False
 
-            zip_files = filter(is_zip_file, downloads_files)
-            print(*zip_files)
-            is_sure = input("Are you sure you want to delete these zip files? (y/n)")
+            zip_files = list(filter(is_zip_file, downloads_files))
+            is_sure = input(
+                f"Are you sure you want to delete these zip files? (y/n)\n{zip_files}"
+            )
 
             if is_sure in ("y", "Y"):
                 for file in zip_files:
-                    os.remove(file)
+                    os.remove(downloads_path / file)
                     print(f"File: {file} removed")
                     debug_logger.info("File: %s removed", file)
 
             else:
-                sys.exit()
+                sys.exit(1)
 
-        except SystemExit as se:
-            debug_logger.info("System exited program: %s", se)
+        except EmptyDirectory as ed:
+            debug_logger.error("Empty directory in del_zip_files: %s", ed)
+            raise
 
         except OSError as oe:
             debug_logger.error("Deletion Issue, OSError: %s", oe)

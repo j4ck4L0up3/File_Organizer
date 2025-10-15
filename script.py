@@ -2,15 +2,6 @@
 
 """For testing script capabilities. May consolidate to main.py"""
 
-import sys
-
-
-def format_menu(options, left_width, right_width):
-    print("File_Organizer Help Menu".center(left_width + right_width, "-"))
-    for opt, desc in options.items():
-        print(opt.ljust(left_width, " ") + desc.rjust(right_width))
-
-
 OPTIONS = {
     "-d, --desktop-flag BOOL": "set False by default. set True to clear your Desktop.",
     "-t, --trash-flag BOOL": "set False by default. set True to automatically delete compressed files from Downloads.",
@@ -19,4 +10,9 @@ OPTIONS = {
     "-h, --help": "show menu",
 }
 
-# format_menu(OPTIONS, 50, 5)
+
+def format_menu(options, left_width, right_width):
+    """format the help menu"""
+    print("File_Organizer Help Menu".center(left_width + right_width, "-"))
+    for opt, desc in options.items():
+        print(opt.ljust(left_width, " ") + desc.rjust(right_width))

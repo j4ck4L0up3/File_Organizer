@@ -1,4 +1,4 @@
-""" Module with classes for special exception behavior """
+"""Module with classes for special exception behavior"""
 
 from pathlib import Path
 
@@ -11,6 +11,9 @@ class EmptyDirectory(Exception):
         self.func_name = func_name
         super().__init__(self.directory, self.func_name)
 
-        def __str__(self):
-            """TODO: add docstring"""
-            return f"Directory {self.directory} is empty in {self.func_name}"
+    def __str__(self):
+        """TODO: add docstring"""
+        return f"Directory {self.directory} is empty in {self.func_name}"
+
+
+# TODO: add special exception for FileExistsError to handle by file rename with (1..n)
