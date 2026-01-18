@@ -12,6 +12,10 @@ from app.special_exceptions import EmptyDirectory
 # uncomment logger for debugging
 # logger = logging.getLogger("Debug Logger")
 
+# uncomment logger for testing
+# logger = logging.getLogger("Test Logger")
+
+# uncomment logger for production
 logger = logging.getLogger("Prod Logger")
 
 

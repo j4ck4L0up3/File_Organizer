@@ -11,6 +11,8 @@ from main import main
 from tests.logger import get_prod_logger
 
 
+# TODO: write integration test for cli
+# TODO: add functionality for excluding certain directories from cleanup
 def cli():
     parser = argparse.ArgumentParser()
 
@@ -51,3 +53,7 @@ def cli():
         logger.addHandler(FileHandler(args.log))
 
     main(desktop_flag=desktop_flag, trash_flag=trash_flag)
+
+
+if __name__ == "__main__":
+    cli()
