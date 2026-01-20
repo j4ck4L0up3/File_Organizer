@@ -399,6 +399,7 @@ def cleanup_downloads_dir(home: Path):
             "Pictures": [".png", ".jpg", ".jpeg", ".svg"],
             "Music": [".wav", ".mp3", ".mp4", ".ogg"],
             "Videos": [".mov", ".avi", ".wmv", ".flv", ".avchd"],
+            "3D Models": [".stl", ".3mf", ".obj", ".step", ".stp", ".fcstd", ".f3d"],
         }
 
         for file in downloads_files:

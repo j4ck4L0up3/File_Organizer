@@ -13,6 +13,7 @@ def main(desktop_flag: bool, trash_flag: bool):
         "Desktop",
         "Fonts",
         "Templates",
+        "3D Models",
         "Hacking",
         "Powerhouse_Vault",
         "Obsidian_Plugin_Sandbox",
